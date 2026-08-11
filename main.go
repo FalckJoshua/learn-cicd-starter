@@ -7,12 +7,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"time"
 
+	"github.com/bootdotdev/learn-cicd-starter/internal/database"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
-
-	"github.com/bootdotdev/learn-cicd-starter/internal/database"
 
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
 )
@@ -31,8 +32,8 @@ func main() {
 			err)
 	}
 
-	port := os.Getenv("PORT")
-	if port == "" {
+	port, err := strconv.Atoi(os.Getenv("PORT"))
+	if err != nil {
 		log.Fatal("PORT environment variable is not set")
 	}
 
@@ -90,10 +91,11 @@ func main() {
 
 	router.Mount("/v1", v1Router)
 	srv := &http.Server{
-		Addr:    ":" + port,
-		Handler: router,
+		Addr:        ":" + strconv.Itoa(port),
+		Handler:     router,
+		ReadTimeout: 5 * time.Second,
 	}
 
-	log.Printf("Serving on port: %s\n", port)
+	log.Printf("Serving on port: %d\n", port)
 	log.Fatal(srv.ListenAndServe())
 }
