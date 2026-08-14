@@ -22,6 +22,8 @@ jobs:
         - name: build
           run: scripts/buildprod.sh
         - name: 'Migrate Database'
+          env:
+            DATABASE_URL: ${{ secrets.DATABASE_URL }}
           run: scripts/migrateup.sh
        
         - id: 'auth'
